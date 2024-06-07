@@ -10,40 +10,37 @@ function App() {
   function toggleForm(){
     setFormDisplay(!formDisplay);
   }
+  const[obj,setObj]=useState({
+    firstName:"",
+    lastName:"",
+    department:"",
+    position:"",
+    salary:""
+  })
   const [arr,setArr]=useState([]);
-  
+
+  const fetchEmployees=async()=>{
+    try{
+      const response=await axios.get('http://localhost:8080/employees/view/all');
+      setArr(response.data);
+    }catch(error){
+      console.log("error getting employees"+error);
+    }
+  }
 
   useEffect(()=>{
-    const fetchEmployees=async()=>{
-      try{
-        const response=await axios.get('http://localhost:8080/employees/view/all');
-        setArr(response.data);
-      }catch(error){
-        console.log("error getting employees"+error);
-      }
-    }
     fetchEmployees();
   },[]);
-
-  
-
   return (
     <>
-     {formDisplay && <AddEmployeForm {...{toggleForm}}/>}
+     {formDisplay && <AddEmployeForm {...{toggleForm,fetchEmployees,obj,setObj}}/>}
      <LandingPage {...{toggleForm}}/>
      <div>
-     <main>
+     <main className='p-2 shadow-2xl overflow-scroll' style={{height:"70vh",width:"70vw",marginLeft:"10%",marginTop:"3%",borderRadius:"10px"}}>
             {console.log(arr)}
-            {arr.map((employee,index)=>{
-                <Employee key={index} {...{employee}}/>
-            })}
-            {/* <Employee
-            firstName="Some"
-            lastName="hhh"
-            department="nkjn"
-            position="joj"
-            salary="dkjodj"
-            /> */}
+            {arr.map((employee,index)=>(
+                <Employee key={index} {...{employee,fetchEmployees}}/>
+            ))}
         </main>
      </div>
     </>
